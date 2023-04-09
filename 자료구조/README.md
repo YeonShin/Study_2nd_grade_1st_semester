@@ -157,3 +157,107 @@
   - 단계는 독립적인 연산단위
   - 이진탐색의 경우 리스트 원소의 수 n으로 단계수 결정은 부적절하다. 결과는 위치(입력)에 따라 다르기 때문이다.
   - Best Case, Worst Case, Average Case로 구분하여 단계 수를 정의할 필요가 있다. 
+>점근 표기법
+- Worst case step count : 최대 수행 단계 수
+- Average case step count : 평균 수행 단계 수
+- 단계수를 결정하는 이유
+  - 시간 복잡도 비교
+  - 실행 시간 증가 예측
+- 근사치 사용
+- [Big oh] : O
+  - n >= n<small><small>0</small></small>, f(n) <= cg(n)를 만족하는 <br>두 양의 상수 c와 n<small><small>0</small></small>이 존재하면 f(n) = O(g(n))
+  - 최악의 경우의 성능을 보장
+- [Big Omega] [f(n) = Ω(g(N))]
+  - n >= n<small><small>0</small></small>, f(n) >= cg(n)를 만족하는 <br>두 양의 상수 c와 n<small><small>0</small></small>이 존재하면 f(n) = Ω(g(n))
+  - 최적의 경우의 성능을 보장
+- [Big Theta] [f(N) = θ(g(N))]
+  -  n >= n<small><small>0</small></small>, C<small><small>1</small></small>g(n) <= f(n) <=> C<small><small>2</small></small>g(n)를 만족하는 <br>세 양의 상수 c1과 c2와 n<small><small>0</small></small>이 존재하면 f(n) = θ(g(n))
+  - 중간의 경우 즉, 평균의 경우
+- 세타표기법이 빅오나 오메가보다 더 정확 but, 빅오를 더 많이 사용
+  
+- [예제] 이원탐색
+  - 인스턴스 특성
+    -  리스트 원소의 수 n
+   - while 루프에서의 반복시간
+     - log<small><small>2</small></small>(n+1)번 : 계속 반으로 쪼개지니까
+   - 최악의 경우 O(log n)번 반복
+ >성능 측정 (Performance Measurement)
+ - 시간 측정
+   - 방법 1 : clock을 사용
+   - 방법 2 : time을 사용
+   - 프로그램의 알고리즘의 시간 = 종료시간 - 시작시간
+  ***
+  ### CH#2. 배열과 구조
+  
+  ***
+>배열 (Array)
+- 추상 데이터 타입
+  - 배열은 **연속된 메모리의 위치**
+  - 추상 데이터타입 관점에서 고려
+  - <index(순서), value(값)>쌍의 집합
+>동적으로 할당된 배열
+  - 동적 메모리 할당
+    - 새로운 메모리 공간이 필요할 때마다 함수 malloc을 호출해서 필요한 양의 공간을 요구
+    - 히프(heap) 기법
+    - 필요성
+      - 프로그램 실행시간에 동적으로 변할 경우
+      - 실행시간을 미루었다가 크기가 정해지면 동적으로 할당
+    - calloc/realloc 함수
+      - calloc : 지정한 양의 메모리를 할당 후 0으로 초기화
+      - realloc : 이미 할당된 메모리 크기 재조정 (추가로 할당 or 크기 줄이기)
+>구조와 유니언
+  - 구조 struct
+    - 타입이 다른 데이터 그룹화
+    - 배열은 같은 타입의 데이터 모임
+  - 유니언
+    - 유니언의 필드들은 **메모리 공간을 공유**
+>다항식 (Polynomials)
+  - 추상 데이터 타입
+    - 배열을 이용하여 다항식 추상데이터 타입 정의
+  - 순서 리스트(Ordered list, linear list)
+    - 원소들의 순서가 있는 모임 ex: 한 주일의 요일들, 카드 한 벌의 값 등등
+    - 연산
+      - 계산, 읽기, 검색, 대체, 삽입, 제거
+    - 메모리로 표현
+    - 메모리 안에서 물리적 인접
+  - 다항식 연산
+    - A(x) = a<small><small>n</small></small>x^5 + a<small><small>n-1</small></small>(x)^(n-1) + ... a<small><small>1</small></small>x + a<small><small>0</small></small>x
+
+      a : coefficient (a<small><small>n</small></small> != 0)
+      
+      e : exponent (unique)
+      
+      x : variable x
+      
+      차수(degree) : 다항식에서 가장 큰 지수 n
+  - Polyminomial 다항식 추상 데이터 타입 정의
+  ```
+  Structure Polynomial
+  Objects : P(x) = 계수가 a1 ~ an, 변수 variable x, e1 ~ en 지수 Exponenets
+
+  Function : 모든 poly, poly1, poly2 ∈ polynomial, coef ∈ Coefficients, expon ∈ Exponents에 대해
+
+  Polynomial Zero() :: = return 다항식 이 때 다항식은 0
+
+  Bolean IsZero(poly) :: = 다항식 poly가 0이라면 True 반환 아니라면 False 반환
+
+  Coefficient coef(poly, expon) :: = 다항식 poly에서 지수가 expon인 항의 계수 반환
+
+  Exponent Lead_Exp(poly) :: = 다항식 poly에서 제일 큰 지수를 반환
+
+  Polynomial Attatch(poly, coef, expon) :: = 다항식에 이미 지수가 expon인 항이 있다면 False 반환,
+  아니라면 계수가 coef이고, 지수가 expon인 항을 다항식에 추가
+
+  Polynomial Remove(poly, expon) :: = 다항식에 지수가 expon인 항이 존재한다면 그 항이 삭제된 다항식 poly 반환
+  else : 오류 반환
+
+  Polynomial SingleMult(poly, coef, expon) :: = 다항식 poly에 계수가 coef이고, 지수가 expon인 항을 곱해준다.
+  ex) p(x) = 3x^2 + 2x + 1, SingleMult(P(x), 2, 1) = 6x^3 + 4x+2 + 2x
+
+  Polynomial Add(poly1, poly2) :: = 두 다항식의 합 반환
+
+  Polynomial Mult(poly1, poly2) :: = 두 다항식의 곱 반환
+
+  end polynomial
+  ```
+  
