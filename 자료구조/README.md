@@ -260,4 +260,137 @@
 
   end polynomial
   ```
-  
+
+- 다항식의 덧셈 함수 padd (초기버전)
+  ```
+  d = Zero();
+  while (! IsZero(a) && ! IsZero(b)) do {
+    switch COMPARE(Lead_Exp(a), Lead_Exp(b)) {
+      case -1:
+        d = Attach (d, Coef(b, Lead_Exp(b)), Lead_Exp(b));
+        b = Remove(b, Lead_Exp(b));
+        break;
+      case 0:
+        sum = Coef(a, Lead_Exp(a)) + Coef(b, Lead_Exp(b));
+        if (sum) {
+          Attach(d, sum, Lead_Exp(a));
+          a = Remove(a, Lead_Exp(a));
+          b = Remove(b, Lead_Exp(b));
+        }
+        break;
+      case 1;
+        d = Attach(d, Coef(a, Lead_Exp(a)), Lead_Exp(a));
+        a = Remove(a, Lead_Exp(a));
+    }
+  }
+  ```
+- 문제점
+  - 메모리 공간의 낭비 초래
+    - ex) 2x^1000 + 8x^2 + 2x 다항식의 경우 실제 항은 3개 뿐이지만 Lead_exp가 1000이므로 0 ~ 1000 만큼의 배열 공간이 필요함
+- 공간 절약을 위해 모든 다항식을 저장하는 전역 배열 terms 도입
+```
+MAX_TERMS 100 /* 항 배열의 크기*/
+typedef struct {
+  float coef;
+  int expon;
+} polynomial;
+polynomial terms[MAX_TERMS];
+int avail = 0;
+```
+- 표현 : terms[MAX_TERMS] = {{10, 5}, {6, 1}, {3, 0}};
+  - 하나의 배열로 여러가지 다항식 표현이 가능하다. 계수가 0인 항은 표현하지 않으므로 공간 절약 가능
+- 개선된 다항식의 덧셈 함수 padd2()
+```
+/* A(x)의 나머지 항들을 첨가한다. */
+for(; starta <= finisha; starta++)
+  attach(terms[starta].coef, term[starta].expon);
+/* B(x)의 나머지 항들을 첨가한다. */
+for(; starta <= finishb; startb++)
+  attach(terms[startb].coef, terms[startb].expon);
+*finishd = avail – 1; 
+```
+- padd() : 알고리즘 분석
+  - O(m*n) -> a : n차 다항식, b : m차 다항식, 최악의 경우 두 다항식의 지수가 상호 교차 되어있다면 빅오는 n * m
+- padd2() : 알고리즘 분석
+  - m, n(>0) : 각각 A와 B의 0이 아닌 항의 수
+  - while 루프 : O(m+n)
+ >희소 행렬 (Sparse Matrix)
+  - 행렬의 원소 중 많은 항들이 '0'으로 구성되어 있는 행렬
+  - 희소 행렬의 대부분의 항은 '0'으로 이루어져 메모리 공간 낭비가 심하다.
+  - 이러한 메모리 공간 낭비를 줄이기 위해 3원소의 쌍 <행, 열, 값>으로 표현되는 0이 아닌 값을 가진 원소를 2차원 배열로 표현한다.
+    - 전치 연산을 효율적으로 표현하기 위해 행을 오름차순으로 조직
+  ```
+          행  열  값
+  a[0]    6   6   8
+  a[1]    0   0   15
+  a[2]    0   3   22
+  a[3]    0   5  -15
+  a[4]    1   1   11
+  a[5]    1   2   3 
+  a[6]    2   3   -6
+  a[7]    4   0   91
+  a[8]    5   2   28
+  ```
+  - 행렬의 전치
+    - simple version
+      - 가장 바깥 쪽 loop : 0 -> a[0].col
+      - 안쪽 loop의 if : 0, 1, 2, ... 열들을 행으로 순차적으로 b에 저장
+      - 시간 복잡도 : O(columns * n), n # 0이 아닌 원소의 갯수
+      - 만약에 n이 열 * 행의 개수와 같다면? O(columns^2 * rows)
+      - 공간은 절약되나 시간복잡도가 매우 커지게 됨
+    - 개선된 버전
+      - .
+  - 행렬 곱셉 
+    - 희소 행렬의 곱셈
+>스트링 (Strings)
+  - C 에서의 스트링
+    - 널 문자 \0 으로 끝나는 문자 배열
+  - 패턴 매칭
+    - .
+  ***
+### CH#3. 스택과 큐
+
+***
+>스택
+  - 스택과 큐
+    - 순서 리스트의 특별한 경우
+  - 스택
+    - 탑(top)이라고 하는 한쪽 끝에서 삽입(push)와 삭제(pop)이 일어남
+    - 후입 선출 리스트(LIFO, Last in first out)
+  - 시스템 스택
+    - 함수 호출 시 스택프레임 이라는 구조를 생성
+      - 이전의 스택프레임
+      - 복귀 주소
+      - 지역 변수
+      - 호출한 함수의 매개 변수
+  - 스택 ADT 구현
+    - 일차원 배열 stack[MAX_STACK_SIZE] 사용
+    - i 번째 원소는 stack[i-1]에 저장
+    - 변수의 top은 스택의 최상위 위치를 가리킴 (초기 top = -1)
+>동적 배열을 사용하는 스택
+  - 동적 배열 이용
+    - 스택의 범위(MAX_STACK_SIZE)를 컴파일 시간에 알아야 하는 단점 극복
+    - MAX_STACK_SIZE 를 capacity로 대체
+>큐 (Queue)
+ - 큐의 개념
+   - 한쪽 끝에서 삽입이 일어나고 그 반대쪽에서 삭제가 일어남
+   - 선입선출(FIFO, First in first out) 리스트
+ - 추상 데이터 타입
+   - 큐를 순차 기억 장소로 표현
+     - 1차원 배열과 두 변수 front(삭제가 일어날 곳), rear(삽입이 일어나는 곳)이 필요하다.
+     - addq와 deleteq의 구현
+       - addq는 rear을 증가, deleteq는 front를 증가
+ - 큐의 응용 분야
+   - 작업 스케줄링
+     - 운영체제에 의한 큐 생성
+     - 시스템에 들어간대로 순서대로 처리(priority 사용 안할 시)
+ - 순차 큐의 문제점
+   - 큐가 점점 오른쪽으로 이동
+   - 결국, rear값이 MAX_QUEUE_SIZE와 같아짐
+   - 문제점 해결 -> 빈공간을 찾아서 이동 -> 비용이 많이 발생(시간복잡도 증가)
+   - 이 문제점 극복을 위해 원형 큐 사용
+ - 원형 큐
+   - 큐가 배열의 끝을 가리키도록 함
+   - 
+
+
